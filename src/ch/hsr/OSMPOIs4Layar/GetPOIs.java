@@ -37,6 +37,7 @@ public class GetPOIs extends HttpServlet {
 		} catch(ClassNotFoundException e) {
 			System.err.println("Unable to load PostgreSQL database driver.");
 			e.printStackTrace();
+			return;
 		}
 
 		String url = "jdbc:postgresql://" + Database.host + "/" + Database.dbname;
