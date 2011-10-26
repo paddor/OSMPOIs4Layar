@@ -40,7 +40,7 @@ public class GetPOIs extends HttpServlet {
 			return;
 		}
 
-		String url = "jdbc:postgresql://" + Database.host + "/" + Database.dbname;
+		String url = "jdbc:postgresql://" + Database.host + ":" + Database.port + "/" + Database.dbname;
 		Properties props = new Properties();
 		props.setProperty("user", Database.user);
 		props.setProperty("password", Database.password);
