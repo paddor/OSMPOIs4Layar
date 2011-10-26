@@ -15,5 +15,6 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/postgresql-9.1-901.jdbc4.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
