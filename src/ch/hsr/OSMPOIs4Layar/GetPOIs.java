@@ -19,6 +19,7 @@ import java.util.Properties;
  */
 public class GetPOIs extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private Connection conn; // database connection
 
     /**
      * Default constructor. 
@@ -43,7 +44,12 @@ public class GetPOIs extends HttpServlet {
 		props.setProperty("user", Database.user);
 		props.setProperty("password", Database.password);
 //		props.setProperty("ssl","true");
-		Connection conn = DriverManager.getConnection(url, props);
+		try {
+			conn = DriverManager.getConnection(url, props);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
