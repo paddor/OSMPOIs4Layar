@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.*;
 import java.util.Properties;
 
-
 /**
  * Servlet implementation class GetPOIs
  */
