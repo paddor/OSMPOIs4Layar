@@ -20,6 +20,7 @@ import java.util.Properties;
 public class GetPOIs extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection conn; // database connection
+	private Boolean connected = false;
 
     /**
      * Default constructor. 
@@ -47,6 +48,7 @@ public class GetPOIs extends HttpServlet {
 //		props.setProperty("ssl","true");
 		try {
 			conn = DriverManager.getConnection(url, props);
+			connected = true;
 			System.err.println("Successfully connected to database.");
 		} catch (SQLException e) {
 			System.err.println("Unable to connect to database.");
@@ -71,7 +73,11 @@ public class GetPOIs extends HttpServlet {
 		writer.println("<body>");
 		writer.println("	<h1>Hello World from a Sevlet!</h1>");
 		writer.println("<p>" + Database.host + "</p>");
-		writer.println("<p>" + conn.toString() + "</p>");
+		if (connected) {
+			writer.println("<p>" + conn.toString() + "</p>");
+		} else {
+			writer.println("No connection to the database. :-(");
+		}
 		writer.println("<body>");
 		writer.println("</html>");
 		writer.close();
