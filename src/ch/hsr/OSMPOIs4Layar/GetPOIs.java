@@ -69,6 +69,7 @@ public class GetPOIs extends HttpServlet {
 		writer.println("<body>");
 		writer.println("	<h1>Hello World from a Sevlet!</h1>");
 		writer.println("<p>" + Database.host + "</p>");
+		writer.println("<p>" + conn.toString() + "</p>");
 		writer.println("<body>");
 		writer.println("</html>");
 		writer.close();
