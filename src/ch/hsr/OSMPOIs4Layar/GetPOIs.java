@@ -36,6 +36,7 @@ public class GetPOIs extends HttpServlet {
 			Class.forName("org.postgresql.Driver");
 		} catch(ClassNotFoundException e) {
 			System.err.println("Unable to load PostgreSQL database driver.");
+			e.printStackTrace();
 			System.exit(1);
 		}
 
@@ -46,8 +47,9 @@ public class GetPOIs extends HttpServlet {
 //		props.setProperty("ssl","true");
 		try {
 			conn = DriverManager.getConnection(url, props);
+			System.err.println("Successfully connected to database.");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Unable to connect to database.");
 			e.printStackTrace();
 		}
 	}
