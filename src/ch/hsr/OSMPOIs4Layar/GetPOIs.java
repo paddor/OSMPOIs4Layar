@@ -21,17 +21,38 @@ public class GetPOIs extends HttpServlet {
 	private Connection conn; // database connection
 	private Boolean connected = false;
 
-    /**
-     * Default constructor. 
-     */
     public GetPOIs() {
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see Servlet#init(ServletConfig)
-	 */
 	public void init(ServletConfig config) throws ServletException {
+		establishDatabaseConnection();
+	}
+
+//	public void destroy() {
+//	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("processing request ...");
+		PrintWriter writer = response.getWriter();
+		writer.println("<html>");
+		writer.println("<head><title>OSMPOIs4Layar</title></head>");
+		writer.println("<body>");
+		writer.println("	<h1>OSMPOIs4Layar</h1>");
+		writer.println("<p>" + Database.host + "</p>");
+		if (connected) {
+			writer.println("<p>Successfully connected to the database. :-)</p>");
+			writer.println("<p>Database connection as String:" + conn.toString() + "</p>");
+		} else {
+			writer.println("No connection to the database. :-(");
+		}
+
+		writer.println("<body>");
+		writer.println("</html>");
+		writer.close();
+	}
+
+	private void establishDatabaseConnection() {
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch(ClassNotFoundException e) {
@@ -44,7 +65,6 @@ public class GetPOIs extends HttpServlet {
 		Properties props = new Properties();
 		props.setProperty("user", Database.user);
 		props.setProperty("password", Database.password);
-//		props.setProperty("ssl","true");
 		try {
 			conn = DriverManager.getConnection(url, props);
 			connected = true;
@@ -53,32 +73,5 @@ public class GetPOIs extends HttpServlet {
 			System.err.println("Unable to connect to database.");
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * @see Servlet#destroy()
-	 */
-	public void destroy() {
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("processing request ...");
-		PrintWriter writer = response.getWriter();
-		writer.println("<html>");
-		writer.println("<head><title>Hello World Servlet</title></head>");
-		writer.println("<body>");
-		writer.println("	<h1>Hello World from a Sevlet!</h1>");
-		writer.println("<p>" + Database.host + "</p>");
-		if (connected) {
-			writer.println("<p>" + conn.toString() + "</p>");
-		} else {
-			writer.println("No connection to the database. :-(");
-		}
-		writer.println("<body>");
-		writer.println("</html>");
-		writer.close();
 	}
 }
