@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -48,12 +47,11 @@ public class GetPOIs extends HttpServlet {
 			writer.println("No connection to the database. :-(");
 		}
 
-
 		try {
-			ArrayList pois = getPOIsFromDatabase();
-			writer.println("<p>Found "+ pois.size() + " POIs in database.</p>");
+			String[] pois = getPOIsFromDatabase(100);
+			writer.println("<p>Found "+ pois.length + " POIs in database.</p>");
 			writer.println("<ul>");
-			for (Object poi : pois) {
+			for (String poi : pois) {
 				writer.println("<li>" + poi + "</li>");
 			}
 			writer.println("</ul>");
@@ -69,7 +67,7 @@ public class GetPOIs extends HttpServlet {
 		writer.close();
 	}
 
-	private ArrayList getPOIsFromDatabase() throws SQLException {
+	private String[] getPOIsFromDatabase(int limit) throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs;
 
@@ -77,16 +75,22 @@ public class GetPOIs extends HttpServlet {
 				"SELECT ST_AsText(osm_poi.way) AS geom, name AS label " +
 		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(8.856484 47.232707)', 4326), 900913) way) AS mylocation " +
 		"WHERE ST_DWithin(osm_poi.way, mylocation.way,1000) " +
-		"LIMIT 100");
+		"LIMIT " + limit);
 
-		ArrayList points = new ArrayList();
+		String[] points = new String[ limit ];
 		int i = 0;
 		while (rs.next()) {
-			points.add(i++, rs.getString(1));
+			points[i++] = rs.getString(1);
 		}
 		rs.close();
 		st.close();
-		return points;
+
+		String[] clean_points = new String[i];
+		for (int j = 0; j < i; j++) {
+			clean_points[j] = points[j];
+		}
+
+		return clean_points;
 }
 
 	private void establishDatabaseConnection() {
