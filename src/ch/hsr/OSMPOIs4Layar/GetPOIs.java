@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.sql.*;
 import java.util.Properties;
+import org.postgis.*;
 
 /**
  * Servlet implementation class GetPOIs
@@ -48,11 +49,11 @@ public class GetPOIs extends HttpServlet {
 		}
 
 		try {
-			String[] pois = getPOIsFromDatabase(100);
+			Point[] pois = getPOIsFromDatabase(100);
 			writer.println("<p>Found "+ pois.length + " POIs in database.</p>");
 			writer.println("<ul>");
-			for (String poi : pois) {
-				writer.println("<li>" + poi + "</li>");
+			for (Point poi : pois) {
+				writer.println("<li>" + poi.toString() + " (" + poi.getClass().getName() + ")</li>");
 			}
 			writer.println("</ul>");
 		} catch (SQLException e) {
@@ -67,25 +68,26 @@ public class GetPOIs extends HttpServlet {
 		writer.close();
 	}
 
-	private String[] getPOIsFromDatabase(int limit) throws SQLException {
+	private Point[] getPOIsFromDatabase(int limit) throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs;
 
 		rs = st.executeQuery(
-		"SELECT astext(Transform(osm_poi.way, 4326)) AS geom, name AS label " +
+		"SELECT Transform(osm_poi.way, 4326) AS geom, name AS label " +
 		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(8.856484 47.232707)', 4326), 900913) way) AS mylocation " +
 		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) " +
 		"LIMIT " + limit);
 
-		String[] points = new String[ limit ];
+		Point[] points = new Point[ limit ];
 		int i = 0;
 		while (rs.next()) {
-			points[i++] = rs.getString(1);
+			PGgeometry geom = (PGgeometry)rs.getObject(1);
+			points[i++] = (Point)geom.getGeometry();
 		}
 		rs.close();
 		st.close();
 
-		String[] clean_points = new String[i];
+		Point[] clean_points = new Point[i];
 		for (int j = 0; j < i; j++) {
 			clean_points[j] = points[j];
 		}
@@ -110,9 +112,22 @@ public class GetPOIs extends HttpServlet {
 			conn = DriverManager.getConnection(url, props);
 			connected = true;
 			System.err.println("Successfully connected to database.");
+
+		    /*
+		    * Add the geometry types to the connection. Note that you
+		    * must cast the connection to the pgsql-specific connection
+		    * implementation before calling the addDataType() method.
+		    */
+		    ((org.postgresql.PGConnection)conn).addDataType("geometry",Class.forName("org.postgis.PGgeometry"));
+		    ((org.postgresql.PGConnection)conn).addDataType("box3d",Class.forName("org.postgis.PGbox3d"));
+		    System.err.println("Successfully registered PostGIS data types.");
 		} catch (SQLException e) {
 			System.err.println("Unable to connect to database.");
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			System.err.println("Unable to register PostGIS data types.");
+			e.printStackTrace();
+			return;
 		}
 	}
 }
