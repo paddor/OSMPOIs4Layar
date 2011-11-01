@@ -77,21 +77,21 @@ public class GetPOIs extends HttpServlet {
 		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) " +
 		"LIMIT " + limit);
 
-		Point[] points = new Point[ limit ];
+		Point[] pois = new Point[ limit ];
 		int i = 0;
 		while (rs.next()) {
 			PGgeometry geom = (PGgeometry)rs.getObject(1);
-			points[i++] = (Point)geom.getGeometry();
+			pois[i++] = (Point)geom.getGeometry();
 		}
 		rs.close();
 		st.close();
 
-		Point[] clean_points = new Point[i];
+		Point[] clean_pois = new Point[i];
 		for (int j = 0; j < i; j++) {
-			clean_points[j] = points[j];
+			clean_pois[j] = pois[j];
 		}
 
-		return clean_points;
+		return clean_pois;
 }
 
 	private void establishDatabaseConnection() {
