@@ -18,7 +18,7 @@ import java.util.Properties;
  */
 public class GetPOIs extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Connection conn; // database connection
+	private java.sql.Connection conn; // database connection
 	private Boolean connected = false;
 
     public GetPOIs() {
