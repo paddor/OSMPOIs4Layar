@@ -72,7 +72,7 @@ public class GetPOIs extends HttpServlet {
 		ResultSet rs;
 
 		rs = st.executeQuery(
-				"SELECT ST_AsText(osm_poi.way) AS geom, name AS label " +
+		"SELECT astext(Transform(osm_poi.way, 4326)) AS geom, name AS label " +
 		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(8.856484 47.232707)', 4326), 900913) way) AS mylocation " +
 		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) " +
 		"LIMIT " + limit);
