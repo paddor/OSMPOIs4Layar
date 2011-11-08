@@ -63,7 +63,13 @@ public class GetPOIs extends HttpServlet {
 			}
 			writer.println("</ul>");
 		} catch (SQLException e) {
-			writer.println("Failed to get the POIs from the database. :-(");
+			writer.println("<p>Failed to get the POIs from the database. :-(</p>");
+			JSONObject j = new JSONObject();
+			j.put("errorCode", 21); // 20..29 allowed
+			j.put("errorString", "Failed to get hotspots from the database.");
+			j.writeJSONString(writer);
+			writer.println("</br>");
+
 			writer.println("<pre>");
 			e.printStackTrace(writer);
 			writer.println("</pre>");
