@@ -41,7 +41,7 @@ public class GetPOIs extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter writer = response.getWriter();
-		print_header(writer);
+		print_header(writer, request);
 
 		try {
 			RequestParser requestParser = new RequestParser(request);
@@ -53,14 +53,6 @@ public class GetPOIs extends HttpServlet {
 			j.writeJSONString(writer);
 			return;
 		}
-
-		writer.println("<code><ul>");
-		for(Enumeration<String> names = request.getParameterNames(); names.hasMoreElements();) {
-			String name = names.nextElement();
-			String value = request.getParameter(name);
-			writer.println("<li>" + name +": " + value + "</li>");
-		}
-		writer.println("</ul></code>");
 
 		try {
 			ArrayList<Point> pois = getPOIsFromDatabase();
@@ -86,7 +78,7 @@ public class GetPOIs extends HttpServlet {
 		writer.close();
 	}
 
-	private void print_header(PrintWriter writer) throws IOException {
+	private void print_header(PrintWriter writer, HttpServletRequest request) throws IOException {
 		writer.println("<html>");
 		writer.println("<head><title>OSMPOIs4Layar</title></head>");
 		writer.println("<body>");
@@ -97,6 +89,14 @@ public class GetPOIs extends HttpServlet {
 		} else {
 			writer.println("<p>Failed to connect to the database.</p>");
 		}
+
+		writer.println("<code><ul>");
+		for(Enumeration<String> names = request.getParameterNames(); names.hasMoreElements();) {
+			String name = names.nextElement();
+			String value = request.getParameter(name);
+			writer.println("<li>" + name +": " + value + "</li>");
+		}
+		writer.println("</ul></code>");
 	}
 
 	private ArrayList<Point> getPOIsFromDatabase() throws SQLException {
