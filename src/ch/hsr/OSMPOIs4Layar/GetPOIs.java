@@ -42,10 +42,11 @@ public class GetPOIs extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter writer = response.getWriter();
 		print_header(writer, request);
+		HashMap<String, Object> requestProperties;
 
 		try {
 			RequestParser requestParser = new RequestParser(request);
-			HashMap<String, Object> requestProperties = requestParser.parse();
+			requestProperties = requestParser.parse();
 		} catch (IllegalArgumentException e) {
 			JSONObject j = new JSONObject();
 			j.put("errorCode", 20); // 20..29 allowed
@@ -55,7 +56,7 @@ public class GetPOIs extends HttpServlet {
 		}
 
 		try {
-			ArrayList<Point> pois = getPOIsFromDatabase();
+			ArrayList<Point> pois = getPOIsFromDatabase(requestProperties);
 			writer.println("<p>Found "+ pois.size() + " POIs in database. (" + pois.getClass().getName() + ").</p>");
 			writer.println("<ul>");
 			for (Point poi : pois) {
@@ -105,14 +106,20 @@ public class GetPOIs extends HttpServlet {
 		writer.println("</ul></code>");
 	}
 
-	private ArrayList<Point> getPOIsFromDatabase() throws SQLException {
+	private ArrayList<Point> getPOIsFromDatabase(HashMap<String, Object> properties) throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs;
 
-		rs = st.executeQuery(
+		Object lon = properties.get("lon");
+		Object lat = properties.get("lat");
+
+		String query =
 		"SELECT Transform(osm_poi.way, 4326) AS geom, name AS label " +
-		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(8.856484 47.232707)', 4326), 900913) way) AS mylocation " +
-		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) ");
+		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(" + lon + " " + lat +
+		")', 4326), 900913) way) AS mylocation " +
+		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) ";
+		System.err.println(query);
+		rs = st.executeQuery(query);
 
 		ArrayList<Point> pois = new ArrayList<Point>();
 		while (rs.next()) {
