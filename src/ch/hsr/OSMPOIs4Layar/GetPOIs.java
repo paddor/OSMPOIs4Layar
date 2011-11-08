@@ -10,8 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.sql.*;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Properties;
 import org.postgis.*;
+
+import org.json.simple.*;
+
+import ch.hsr.OSMPOIs4Layar.*;
 
 /**
  * Servlet implementation class GetPOIs
@@ -35,24 +41,33 @@ public class GetPOIs extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("processing request ...");
 		PrintWriter writer = response.getWriter();
-		writer.println("<html>");
-		writer.println("<head><title>OSMPOIs4Layar</title></head>");
-		writer.println("<body>");
-		writer.println("	<h1>OSMPOIs4Layar</h1>");
-		writer.println("<p>" + Database.host + "</p>");
-		if (connected) {
-			writer.println("<p>Successfully connected to the database. :-)</p>");
-			writer.println("<p>Database connection as String:" + conn.toString() + "</p>");
-		} else {
-			writer.println("No connection to the database. :-(");
-		}
+		print_header(writer);
 
 		try {
-			Point[] pois = getPOIsFromDatabase(100);
-			writer.println("<p>Found "+ pois.length + " POIs in database.</p>");
+			RequestParser requestParser = new RequestParser(request);
+			HashMap<String, Object> requestProperties = requestParser.parse();
+		} catch (IllegalArgumentException e) {
+			JSONObject j = new JSONObject();
+			j.put("errorCode", 20); // 20..29 allowed
+			j.put("errorString", e.getMessage());
+			j.writeJSONString(writer);
+			return;
+		}
+
+		writer.println("<code><ul>");
+		for(Enumeration<String> names = request.getParameterNames(); names.hasMoreElements();) {
+			String name = names.nextElement();
+			String value = request.getParameter(name);
+			writer.println("<li>" + name +": " + value + "</li>");
+		}
+		writer.println("</ul></code>");
+
+		try {
+			Point[] pois = getPOIsFromDatabase();
+			writer.println("<p>Found "+ pois.length + " POIs in database. (" + pois.getClass().getName() + ").</p>");
 			writer.println("<ul>");
 			for (Point poi : pois) {
-				writer.println("<li>" + poi.toString() + " (" + poi.getClass().getName() + ")</li>");
+				writer.println("<li>" + poi.toString() +"</li>");
 			}
 			writer.println("</ul>");
 		} catch (SQLException e) {
@@ -62,20 +77,37 @@ public class GetPOIs extends HttpServlet {
 			writer.println("</pre>");
 		}
 
+		print_footer(writer);
+	}
+
+	private void print_footer(PrintWriter writer) {
 		writer.println("<body>");
 		writer.println("</html>");
 		writer.close();
 	}
 
-	private Point[] getPOIsFromDatabase(int limit) throws SQLException {
+	private void print_header(PrintWriter writer) throws IOException {
+		writer.println("<html>");
+		writer.println("<head><title>OSMPOIs4Layar</title></head>");
+		writer.println("<body>");
+		writer.println("	<h1>OSMPOIs4Layar</h1>");
+
+		if (connected) {
+			writer.println("<p>Successfully connected to the database " + Database.dbname + ".</p>");
+		} else {
+			writer.println("<p>Failed to connect to the database.</p>");
+		}
+	}
+
+	private Point[] getPOIsFromDatabase() throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs;
+		int limit = 1000;
 
 		rs = st.executeQuery(
 		"SELECT Transform(osm_poi.way, 4326) AS geom, name AS label " +
 		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(8.856484 47.232707)', 4326), 900913) way) AS mylocation " +
-		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) " +
-		"LIMIT " + limit);
+		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) ");
 
 		Point[] pois = new Point[ limit ];
 		int i = 0;
