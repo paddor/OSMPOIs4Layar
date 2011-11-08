@@ -40,7 +40,6 @@ public class GetPOIs extends HttpServlet {
 //	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("processing request ...");
 		PrintWriter writer = response.getWriter();
 		print_header(writer);
 
