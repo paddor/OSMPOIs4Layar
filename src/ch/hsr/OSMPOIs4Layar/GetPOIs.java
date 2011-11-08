@@ -92,13 +92,13 @@ public class GetPOIs extends HttpServlet {
 		}
 
 		return clean_pois;
-}
+	}
 
 	private void establishDatabaseConnection() {
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch(ClassNotFoundException e) {
-			System.err.println("Unable to load PostgreSQL database driver.");
+			System.err.println("Failed to load PostgreSQL database driver.");
 			e.printStackTrace();
 			return;
 		}
@@ -121,10 +121,10 @@ public class GetPOIs extends HttpServlet {
 		    ((org.postgresql.PGConnection)conn).addDataType("box3d",Class.forName("org.postgis.PGbox3d"));
 		    System.err.println("Successfully registered PostGIS data types.");
 		} catch (SQLException e) {
-			System.err.println("Unable to connect to database.");
+			System.err.println("Failed to connect to database.");
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			System.err.println("Unable to register PostGIS data types.");
+			System.err.println("Failed to register PostGIS data types.");
 			e.printStackTrace();
 			return;
 		}
