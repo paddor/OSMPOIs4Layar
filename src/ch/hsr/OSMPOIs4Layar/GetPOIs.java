@@ -59,7 +59,7 @@ public class GetPOIs extends HttpServlet {
 			writer.println("<p>Found "+ pois.size() + " POIs in database. (" + pois.getClass().getName() + ").</p>");
 			writer.println("<ul>");
 			for (Point poi : pois) {
-				writer.println("<li>" + poi.toString() +"</li>");
+				writer.println("<li>Point(X:" + poi.getX() + " Y:" + poi.getY() + ")</li>");
 			}
 			writer.println("</ul>");
 		} catch (SQLException e) {
