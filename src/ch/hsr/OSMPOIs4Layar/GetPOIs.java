@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
@@ -63,8 +64,8 @@ public class GetPOIs extends HttpServlet {
 		writer.println("</ul></code>");
 
 		try {
-			Point[] pois = getPOIsFromDatabase();
-			writer.println("<p>Found "+ pois.length + " POIs in database. (" + pois.getClass().getName() + ").</p>");
+			ArrayList<Point> pois = getPOIsFromDatabase();
+			writer.println("<p>Found "+ pois.size() + " POIs in database. (" + pois.getClass().getName() + ").</p>");
 			writer.println("<ul>");
 			for (Point poi : pois) {
 				writer.println("<li>" + poi.toString() +"</li>");
@@ -99,31 +100,24 @@ public class GetPOIs extends HttpServlet {
 		}
 	}
 
-	private Point[] getPOIsFromDatabase() throws SQLException {
+	private ArrayList<Point> getPOIsFromDatabase() throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs;
-		int limit = 1000;
 
 		rs = st.executeQuery(
 		"SELECT Transform(osm_poi.way, 4326) AS geom, name AS label " +
 		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(8.856484 47.232707)', 4326), 900913) way) AS mylocation " +
 		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) ");
 
-		Point[] pois = new Point[ limit ];
-		int i = 0;
+		ArrayList<Point> pois = new ArrayList<Point>();
 		while (rs.next()) {
 			PGgeometry geom = (PGgeometry)rs.getObject(1);
-			pois[i++] = (Point)geom.getGeometry();
+			pois.add((Point)geom.getGeometry());
 		}
 		rs.close();
 		st.close();
 
-		Point[] clean_pois = new Point[i];
-		for (int j = 0; j < i; j++) {
-			clean_pois[j] = pois[j];
-		}
-
-		return clean_pois;
+		return pois;
 	}
 
 	private void establishDatabaseConnection() {
