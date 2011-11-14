@@ -42,11 +42,10 @@ public class GetPOIs extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter writer = response.getWriter();
 		print_header(writer, request);
-		HashMap<String, Object> requestProperties;
+		GetPOIsRequest getPOIsRequest;
 
 		try {
-			RequestParser requestParser = new RequestParser(request);
-			requestProperties = requestParser.parse();
+			getPOIsRequest = new GetPOIsRequest(request);
 		} catch (IllegalArgumentException e) {
 			JSONObject j = new JSONObject();
 			j.put("errorCode", 20); // 20..29 allowed
@@ -56,7 +55,7 @@ public class GetPOIs extends HttpServlet {
 		}
 
 		try {
-			ArrayList<Point> pois = getPOIsFromDatabase(requestProperties);
+			ArrayList<Point> pois = getPOIsFromDatabase(getPOIsRequest);
 			writer.println("<p>Found "+ pois.size() + " POIs in database. (" + pois.getClass().getName() + ").</p>");
 			writer.println("<ul>");
 			for (Point poi : pois) {
@@ -106,12 +105,12 @@ public class GetPOIs extends HttpServlet {
 		writer.println("</ul></code>");
 	}
 
-	private ArrayList<Point> getPOIsFromDatabase(HashMap<String, Object> properties) throws SQLException {
+	private ArrayList<Point> getPOIsFromDatabase(GetPOIsRequest properties) throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs;
 
-		Object lon = properties.get("lon");
-		Object lat = properties.get("lat");
+		double lon = properties.lon;
+		double lat = properties.lat;
 
 		String query =
 		"SELECT Transform(osm_poi.way, 4326) AS geom, name AS label " +
