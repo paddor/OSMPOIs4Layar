@@ -111,12 +111,19 @@ public class GetPOIs extends HttpServlet {
 
 		double lon = properties.lon;
 		double lat = properties.lat;
+		int radius;
+
+		if (properties.hasRadius()) {
+			radius = properties.getRadius();
+		} else {
+			radius = 1000;
+		}
 
 		String query =
 		"SELECT Transform(osm_poi.way, 4326) AS geom, name AS label " +
 		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(" + lon + " " + lat +
 		")', 4326), 900913) way) AS mylocation " +
-		"WHERE ST_DWithin(osm_poi.way, mylocation.way, 1000) ";
+		"WHERE ST_DWithin(osm_poi.way, mylocation.way, " + radius + ") ";
 		System.err.println(query);
 		rs = st.executeQuery(query);
 
