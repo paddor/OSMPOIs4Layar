@@ -1,4 +1,4 @@
-package ch.hsr.OSMPOIs4Layar;
+package ch.hsr.osmpois4layar;
 
 import javax.servlet.http.HttpServletRequest;
 

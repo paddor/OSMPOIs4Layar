@@ -1,4 +1,4 @@
-package ch.hsr.OSMPOIs4Layar;
+package ch.hsr.osmpois4layar;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,7 +18,7 @@ import org.postgis.*;
 
 import org.json.simple.*;
 
-import ch.hsr.OSMPOIs4Layar.*;
+import ch.hsr.osmpois4layar.*;
 
 /**
  * Servlet implementation class GetPOIs
@@ -117,6 +117,10 @@ public class GetPOIs extends HttpServlet {
 			radius = properties.getRadius();
 		} else {
 			radius = 1000;
+		}
+		
+		if (properties.hasAccuracy()) {
+			radius += properties.getAccuracy();
 		}
 
 		String query =

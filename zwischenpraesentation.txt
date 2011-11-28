@@ -1,0 +1,21 @@
+= OSMPOIs4Layar
+
+== Prototyp
+* http://localhost:8080/OSMPOIs4Layar/GetPOIs
+
+== Was habe ich gemacht?
+* 
+
+== Architektur
+* http://layar.pbworks.com/w/page/7783214/Layar%20Platform%20Architecture%20Overview
+
+== Schwierigkeiten
+* Java
+* verschiedene Versionen vom "Java Web Module"
+* Jetty
+* Datenbankverbindung (JDBC-Treiber)
+* Array-Groesse
+* Hoehe der POIs ("Hotspots")
+* Port 8080 vom virtuellen Server ins Internet
+
+== Planung
