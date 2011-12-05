@@ -26,7 +26,10 @@ public class GetPOIsRequest {
 			this.lon = Float.parseFloat(request.getParameter("lon"));
 			this.version = request.getParameter("version");
 
+			////
 			// optional
+			//
+			
 			String raw_accuracy = request.getParameter("accuracy");
 			if (raw_accuracy != null) {
 				this.accuracy = Integer.parseInt(raw_accuracy);
