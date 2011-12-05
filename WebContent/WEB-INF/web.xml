@@ -13,7 +13,7 @@
     <description></description>
     <display-name>GetPOIs</display-name>
     <servlet-name>GetPOIs</servlet-name>
-    <servlet-class>ch.hsr.OSMPOIs4Layar.GetPOIs</servlet-class>
+    <servlet-class>ch.hsr.osmpois4layar.GetPOIs</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>GetPOIs</servlet-name>
