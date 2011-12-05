@@ -41,7 +41,6 @@ public class GetPOIs extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter writer = response.getWriter();
-		print_header(writer, request);
 		GetPOIsRequest getPOIsRequest;
 
 		try {
@@ -55,57 +54,27 @@ public class GetPOIs extends HttpServlet {
 		}
 
 		try {
-			ArrayList<Point> pois = getPOIsFromDatabase(getPOIsRequest);
-			writer.println("<p>Found "+ pois.size() + " POIs in database. (" + pois.getClass().getName() + ").</p>");
-			writer.println("<ul>");
-			for (Point poi : pois) {
-				writer.println("<li>Point(X:" + poi.getX() + " Y:" + poi.getY() + ")</li>");
+			ArrayList<Hotspot> pois = getPOIsFromDatabase(getPOIsRequest);
+			JSONObject j = new JSONObject();
+			JSONArray hotspots = new JSONArray();
+			for(Hotspot poi : pois) {
+				hotspots.add(poi.to_json());
 			}
-			writer.println("</ul>");
+			j.put("hotspots", hotspots);
+			j.put("errorCode", 0);
+			j.put("errorString", "ok");
+			j.writeJSONString(writer);
+			return;
 		} catch (SQLException e) {
-			writer.println("<p>Failed to get the POIs from the database. :-(</p>");
 			JSONObject j = new JSONObject();
 			j.put("errorCode", 21); // 20..29 allowed
 			j.put("errorString", "Failed to get hotspots from the database.");
 			j.writeJSONString(writer);
-			writer.println("</br>");
-
-			writer.println("<pre>");
-			e.printStackTrace(writer);
-			writer.println("</pre>");
+			return;
 		}
-
-		print_footer(writer);
 	}
 
-	private void print_footer(PrintWriter writer) {
-		writer.println("<body>");
-		writer.println("</html>");
-		writer.close();
-	}
-
-	private void print_header(PrintWriter writer, HttpServletRequest request) throws IOException {
-		writer.println("<html>");
-		writer.println("<head><title>OSMPOIs4Layar</title></head>");
-		writer.println("<body>");
-		writer.println("	<h1>OSMPOIs4Layar</h1>");
-
-		if (connected) {
-			writer.println("<p>Successfully connected to the database " + Database.dbname + ".</p>");
-		} else {
-			writer.println("<p>Failed to connect to the database.</p>");
-		}
-
-		writer.println("<code><ul>");
-		for(Enumeration<String> names = request.getParameterNames(); names.hasMoreElements();) {
-			String name = names.nextElement();
-			String value = request.getParameter(name);
-			writer.println("<li>" + name +": " + value + "</li>");
-		}
-		writer.println("</ul></code>");
-	}
-
-	private ArrayList<Point> getPOIsFromDatabase(GetPOIsRequest properties) throws SQLException {
+	private ArrayList<Hotspot> getPOIsFromDatabase(GetPOIsRequest properties) throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs;
 
@@ -131,15 +100,16 @@ public class GetPOIs extends HttpServlet {
 		System.err.println(query);
 		rs = st.executeQuery(query);
 
-		ArrayList<Point> pois = new ArrayList<Point>();
+		ArrayList<Hotspot> hotspots = new ArrayList<Hotspot>();
 		while (rs.next()) {
 			PGgeometry geom = (PGgeometry)rs.getObject(1);
-			pois.add((Point)geom.getGeometry());
+			Hotspot hotspot = new Hotspot(properties.layerName, (Point)geom.getGeometry(), (String)rs.getObject(2)); 
+			hotspots.add(hotspot);
 		}
 		rs.close();
 		st.close();
 
-		return pois;
+		return hotspots;
 	}
 
 	private void establishDatabaseConnection() {
