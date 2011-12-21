@@ -27,6 +27,11 @@ public class Hotspot {
 		geolocation.put("lat", this.geolocation.getY());
 		anchor.put("geolocation", geolocation);
 		j.put("anchor", anchor);
+
+		JSONObject text = new JSONObject();
+		text.put("title", this.title);
+		j.put("text", text);
+
 		return j;
 	}
 	
