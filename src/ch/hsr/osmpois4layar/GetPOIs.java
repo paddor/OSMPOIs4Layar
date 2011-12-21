@@ -39,6 +39,7 @@ public class GetPOIs extends HttpServlet {
 //	public void destroy() {
 //	}
 
+	@SuppressWarnings("unchecked")
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter writer = response.getWriter();
 		GetPOIsRequest getPOIsRequest;
