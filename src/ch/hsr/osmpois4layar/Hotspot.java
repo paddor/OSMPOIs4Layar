@@ -16,6 +16,7 @@ public class Hotspot {
 		this.title = title;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public JSONObject to_json() {
 		JSONObject j = new JSONObject();
 		j.put("id", this.uniqueId());
