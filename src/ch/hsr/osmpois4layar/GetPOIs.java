@@ -98,6 +98,9 @@ public class GetPOIs extends HttpServlet {
 		"FROM osm_poi, (SELECT ST_Transform( ST_GeomFromText('POINT(" + lon + " " + lat +
 		")', 4326), 900913) way) AS mylocation " +
 		"WHERE ST_DWithin(osm_poi.way, mylocation.way, " + radius + ") ";
+		if (properties.hasName()) {
+			query = query + "AND name = '%" + properties.getName() + "%'";
+		}
 		System.err.println(query);
 		rs = st.executeQuery(query);
 

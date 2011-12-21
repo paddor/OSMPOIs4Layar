@@ -9,6 +9,7 @@ public class GetPOIsRequest {
 	public String userId, layerName, version;
 	public double lat, lon;
 	private int accuracy, radius;
+	private String name;
 
 
 	public GetPOIsRequest(HttpServletRequest request) {
@@ -48,6 +49,13 @@ public class GetPOIsRequest {
 			} else {
 				this.radius = -1;
 			}
+
+			String raw_name = request.getParameter("SEARCHBOX");
+			if (raw_name != null) {
+				this.name = raw_name;
+			} else {
+				this.name = "";
+			}
 		} catch (NullPointerException e) {
 			throw new IllegalArgumentException("Malformed request.");
 		}
@@ -63,11 +71,20 @@ public class GetPOIsRequest {
 		return true;
 	}
 
+	public boolean hasName() {
+		if (name.length() == 0) return false;
+		return true;
+	}
+
 	public int getAccuracy() {
 		return this.accuracy;	
 	}
 
 	public int getRadius() {
 		return this.radius;	
+	}
+
+	public String getName() {
+		return this.name;
 	}
 }
