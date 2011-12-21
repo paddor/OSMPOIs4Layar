@@ -20,6 +20,7 @@ public class Hotspot {
 	public JSONObject to_json() {
 		JSONObject j = new JSONObject();
 		j.put("id", this.uniqueId());
+
 		JSONObject anchor = new JSONObject();
 		JSONObject geolocation = new JSONObject();
 		geolocation.put("lon", this.geolocation.getX());
