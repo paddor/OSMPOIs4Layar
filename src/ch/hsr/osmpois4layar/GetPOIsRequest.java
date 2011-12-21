@@ -40,7 +40,6 @@ public class GetPOIsRequest {
 				this.accuracy = -1;
 			}
 
-
 			String raw_radius = request.getParameter("radius");
 			if (raw_radius != null) {
 				this.radius = Integer.parseInt(raw_radius);
